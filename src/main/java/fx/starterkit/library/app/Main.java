@@ -33,8 +33,8 @@ public class Main extends Application {
 	
 	private TableView<Book> table = new TableView<Book>();
 	private final ObservableList<Author> authorsList = FXCollections.observableArrayList(
-            new Author("Andrzej", "Duda"),
-            new Author("Antoni", "Macierewicz"));
+            new Author(1L, "Andrzej", "Duda"),
+            new Author(2L, "Antoni", "Macierewicz"));
     private final ObservableList<Book> data =
             FXCollections.observableArrayList(
             		new Book(1L, "Narrenturm", "Andrzej Sapkowski", authorsList),
@@ -144,7 +144,8 @@ public class Main extends Application {
         infoArea.setEditable(false);
         infoArea.setPrefWidth(300);
         infoArea.setPrefHeight(400);
-        infoArea.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 15));
+        //infoArea.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 15));
+        infoArea.setFont(Font.font("Helvetica", 15));
  
         final Button addButton = new Button("Add");
         addButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -198,7 +199,7 @@ public class Main extends Application {
         			infoArea.appendText("Book info:\n\nID: " + table.getSelectionModel().getSelectedItem().getId()
         					+ "\nTitle: " + table.getSelectionModel().getSelectedItem().getTitle()
         					+ "\nAuthor: " + table.getSelectionModel().getSelectedItem().getAuthor());
-        			infoArea.appendText("\nAuthors:");
+        			infoArea.appendText("\n\nList of Authors:");
         			for(Iterator<Author> it = table.getSelectionModel().getSelectedItem().getAuthors().iterator() ; it.hasNext() ; ) {
         				Author curr = it.next();
         				infoArea.appendText("\n" + curr.getFirstName() + " " + curr.getLastName());
@@ -230,6 +231,7 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
+    
 	/*
 	private static final String BUNDLEPATH = "fx/starterkit/library/bundle/bundle";
 	private static final String FXMLPATH = "/fx/starterkit/library/view/Library.fxml";

@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import fx.starterkit.library.model.BookVO;
+import fx.starterkit.library.model.Book;
 
 public class Mapper {
 
 	private Gson gson = new Gson();
 	
-	public ArrayList<BookVO> json2BookVOList(String json) {
-		ArrayList<BookVO> bookToList = new Gson().fromJson(json, new TypeToken<ArrayList<BookVO>>() {
+	public ArrayList<Book> json2BookList(String json) {
+		ArrayList<Book> bookList = new Gson().fromJson(json, new TypeToken<ArrayList<Book>>() {
 		}.getType());
-		return bookToList;
+		return bookList;
 	}
 	
-	public BookVO json2BookVO(String json){
-		BookVO book = gson.fromJson(json, BookVO.class);
+	public Book json2Book(String json){
+		Book book = gson.fromJson(json, Book.class);
 		return book;
 	}
 

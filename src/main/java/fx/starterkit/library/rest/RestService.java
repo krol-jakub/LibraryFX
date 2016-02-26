@@ -15,13 +15,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import fx.starterkit.library.mapper.Mapper;
-import fx.starterkit.library.model.BookVO;
+import fx.starterkit.library.model.Book;
 
 public class RestService {
 	
 	private Mapper mapper = new Mapper();
 
-	public BookVO sendPOST(String jsonString) throws ClientProtocolException, IOException {
+	public Book sendPOST(String jsonString) throws ClientProtocolException, IOException {
 		String url = "http://localhost:9721/workshop/services/books/book";
 
 		HttpClient client = HttpClientBuilder.create().build();
@@ -38,12 +38,12 @@ public class RestService {
 		while ((line = bufferedReader.readLine()) != null) {
 			result.append(line);
 		}
-		BookVO book = mapper.json2BookVO(result.toString());
+		Book book = mapper.json2Book(result.toString());
 		System.out.println(result.toString());
 		return book;
 	}
 
-	public ArrayList<BookVO> sendGET(String titlePrefix) throws IOException {
+	public ArrayList<Book> sendGET(String titlePrefix) throws IOException {
 		String url = "http://localhost:9721/workshop/services/books/books-by-title?titlePrefix=" + titlePrefix;
 
 		HttpClient client = HttpClientBuilder.create().build();
@@ -60,7 +60,7 @@ public class RestService {
 			result.append(line);
 		}
 
-		ArrayList<BookVO> bookToList = mapper.json2BookVOList(result.toString());
+		ArrayList<Book> bookToList = mapper.json2BookList(result.toString());
 		System.out.println(result.toString());
 		return bookToList;
 	}
