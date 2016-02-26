@@ -1,18 +1,33 @@
 package fx.starterkit.library.model;
 
+import java.util.List;
+
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Book {
 	
 	private final SimpleLongProperty id;
 	private final SimpleStringProperty title;
 	private final SimpleStringProperty author;
+	private final SimpleListProperty<Author> authors;
 	
 	public Book(Long id, String title, String author) {
 		this.id = new SimpleLongProperty(id);
 		this.title = new SimpleStringProperty(title);
 		this.author = new SimpleStringProperty(author);
+		this.authors = new SimpleListProperty<Author>();
+	}
+	
+	public Book(Long id, String title, String author, List<Author> list) {
+		this.id = new SimpleLongProperty(id);
+		this.title = new SimpleStringProperty(title);
+		this.author = new SimpleStringProperty(author);
+		ObservableList<Author> obList = FXCollections.observableArrayList(list);
+		this.authors = new SimpleListProperty<Author>(obList);
 	}
 
 	public Long getId() {
@@ -39,6 +54,15 @@ public class Book {
 		author.set(authorr);
 	}
 	
+	public void setAuthors(ObservableList<Author> authorList) {
+		authors.setAll(authorList);
+		//authors.addAll(authorList);
+	}
+	
+	public SimpleListProperty<Author> getAuthors() {
+		return authors;
+	}
+
 	@Override
 	public int hashCode() {
 		return title.hashCode() + author.hashCode() + id.intValue();

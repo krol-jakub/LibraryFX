@@ -1,7 +1,9 @@
 package fx.starterkit.library.app;
 
-import com.sun.prism.paint.Color;
+import java.util.Comparator;
+import java.util.Iterator;
 
+import fx.starterkit.library.model.Author;
 import fx.starterkit.library.model.Book;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -30,20 +32,32 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	
 	private TableView<Book> table = new TableView<Book>();
+	private final ObservableList<Author> authorsList = FXCollections.observableArrayList(
+            new Author("Andrzej", "Duda"),
+            new Author("Antoni", "Macierewicz"));
     private final ObservableList<Book> data =
             FXCollections.observableArrayList(
-            		new Book(1L, "Narrenturm", "Andrzej Sapkowski"),
-                    new Book(2L, "Bozy Bojownicy", "Andrzej Sapkowski"),
-                    new Book(3L, "Lux Perpetua", "Andrzej Sapkowski"),
-                    new Book(4L, "Lalka", "Boleslaw Prus"),
-                    new Book(5L, "Mistrz i Malgorzata", "Mihail Bulhakov"),
-                    new Book(6L, "Kolejna", "Imie Nazwisko"),
-                    new Book(7L, "Nastepna", "Kolejny Autor"),
-                    new Book(8L, "Ostatnia", "Autor Zapomniany"));
+            		new Book(1L, "Narrenturm", "Andrzej Sapkowski", authorsList),
+                    new Book(5L, "Mistrz i Malgorzata", "Mihail Bulhakov", authorsList),
+                    new Book(3L, "Lux Perpetua", "Andrzej Sapkowski", authorsList),
+                    new Book(2L, "Bozy Bojownicy", "Andrzej Sapkowski", authorsList),
+                    new Book(6L, "Kolejna", "Imie Nazwisko", authorsList),
+                    new Book(4L, "Lalka", "Boleslaw Prus", authorsList),
+                    new Book(8L, "Ostatnia", "Autor Zapomniany", authorsList),
+                    new Book(7L, "Nastepna", "Kolejny Autor", authorsList));
     private final ObservableList<Book> newData =
     		FXCollections.observableArrayList(
-    				new Book(1L, "Hehe", "Hoho"));
+    				new Book(1L, "Hehe", "Hoho", authorsList),
+    				new Book(2L, "Poland Stronk", "Ble", authorsList));
     final HBox hb = new HBox();
+    
+    Comparator<? super Book> compareByID = new Comparator<Book>() {
+    	@Override
+    	public int compare(Book b1, Book b2) {
+    		return Math.toIntExact(b1.getId() - b2.getId());
+
+    	}
+    };
  
     public static void main(String[] args) {
         launch(args);
@@ -56,6 +70,8 @@ public class Main extends Application {
         stage.setTitle("Library");
         stage.setWidth(800);
         stage.setHeight(550);
+        
+        FXCollections.sort(data, compareByID);
  
         final Label label = new Label("Books Library");
         label.setFont(new Font("Arial", 20));
@@ -134,10 +150,18 @@ public class Main extends Application {
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                data.add(new Book(
-                		Long.parseLong(addId.getText()),
-                        addTitle.getText(),
-                        addAuthor.getText()));
+            	if(addId.getText().equals("")) {
+            		long newId = new Long(data.get(data.size()-1).getId());
+            		Book newBook = new Book(new Long(newId + 1), addTitle.getText(), addAuthor.getText());
+            		data.add(newBook);
+            		
+            	}
+            	else {
+            		data.add(new Book(
+            				Long.parseLong(addId.getText()),
+            				addTitle.getText(),
+            				addAuthor.getText()));            		
+            	}
                 addId.clear();
                 addTitle.clear();
                 addAuthor.clear();
@@ -174,6 +198,11 @@ public class Main extends Application {
         			infoArea.appendText("Book info:\n\nID: " + table.getSelectionModel().getSelectedItem().getId()
         					+ "\nTitle: " + table.getSelectionModel().getSelectedItem().getTitle()
         					+ "\nAuthor: " + table.getSelectionModel().getSelectedItem().getAuthor());
+        			infoArea.appendText("\nAuthors:");
+        			for(Iterator<Author> it = table.getSelectionModel().getSelectedItem().getAuthors().iterator() ; it.hasNext() ; ) {
+        				Author curr = it.next();
+        				infoArea.appendText("\n" + curr.getFirstName() + " " + curr.getLastName());
+        			}
         		}
         		table.getSelectionModel().clearSelection();
         	}
