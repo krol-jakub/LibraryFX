@@ -2,6 +2,7 @@ package fx.starterkit.library.app;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import fx.starterkit.library.model.Author;
 import fx.starterkit.library.model.Book;
@@ -110,7 +111,7 @@ public class Main extends Application {
             }
         );
  
-        TableColumn<Book, String> authorCol = new TableColumn<Book, String>("Author");
+        /*TableColumn<Book, String> authorCol = new TableColumn<Book, String>("Author");
         authorCol.setMinWidth(200);
         authorCol.setCellValueFactory(
             new PropertyValueFactory<Book, String>("author"));
@@ -124,10 +125,15 @@ public class Main extends Application {
                         ).setAuthor(t.getNewValue());
                 }
             }
-        );
+        );*/
+        
+        /*TableColumn<Book, List<Author>> authorsCol = new TableColumn<Book, List<Author>>("Authors");
+        authorsCol.setMinWidth(200);
+        authorsCol.setCellValueFactory(new PropertyValueFactory<Book, List<Author>>("author"));
+        authorsCol.setCellFactory();*/
  
         table.setItems(data);
-        table.getColumns().addAll(idCol, titleCol, authorCol);
+        table.getColumns().addAll(idCol, titleCol);
  
         final TextField addId = new TextField();
         addId.setPromptText("ID");
@@ -136,7 +142,7 @@ public class Main extends Application {
         addTitle.setMaxWidth(titleCol.getPrefWidth());
         addTitle.setPromptText("Title");
         final TextField addAuthor = new TextField();
-        addAuthor.setMaxWidth(authorCol.getPrefWidth());
+        addAuthor.setMaxWidth(titleCol.getPrefWidth());
         addAuthor.setPromptText("Author");
         
         final TextArea infoArea = new TextArea();
