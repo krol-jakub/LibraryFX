@@ -1,5 +1,6 @@
 package fx.starterkit.library.dataprovider;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 
 import fx.starterkit.library.dataprovider.impl.DataProviderImpl;
@@ -13,6 +14,6 @@ public interface DataProvider {
     
     void deleteBook(Long id);
     
-    Book addBook(Book book);
+    Book addBook(Book book) throws URISyntaxException;
 
 }

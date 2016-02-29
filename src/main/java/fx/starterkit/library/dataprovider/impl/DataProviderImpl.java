@@ -52,8 +52,8 @@ public class DataProviderImpl implements DataProvider {
 	}
 	
 	@SuppressWarnings("null")
-	public Book addBook(Book bookVO) {
-		HttpForm client = null;
+	public Book addBook(Book bookVO) throws URISyntaxException {
+		HttpForm client = new HttpForm(new URI(requestPath + "/book/"));
 		client.setContentType("Application/JSON");
         HttpResponse response = null;
         String book = null;

@@ -1,6 +1,7 @@
 package fx.starterkit.library.app;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -89,7 +90,6 @@ public class Main extends Application {
         final TextField titlePrefix = new TextField();
         titlePrefix.setPromptText("Book search: Enter (part of a) title");
         titlePrefix.setPrefWidth(200);
-        //titlePrefix.setAlignment(Pos.BASELINE_RIGHT);
  
         table.setEditable(true);
         table.setPrefWidth(TableView.USE_COMPUTED_SIZE);
@@ -98,7 +98,6 @@ public class Main extends Application {
         idCol.setMinWidth(50);
         idCol.setMaxWidth(50);
         idCol.setCellValueFactory(new PropertyValueFactory<Book, Long>("id"));
-        //idCol.setCellFactory(TextFieldTableCell.forTableColumn());
         idCol.setOnEditCommit(
             new EventHandler<CellEditEvent<Book, Long>>() {
                 @Override
@@ -155,7 +154,7 @@ public class Main extends Application {
             	if(addId.getText().equals("")) {
             		long newId = new Long(data.get(data.size()-1).getId());
             		Book newBook = new Book(new Long(newId + 1), addTitle.getText(), Author.parseAuthors(addAuthor.getText()));
-            		//dataProvider.addBook(newBook);
+						//dataProvider.addBook(newBook);
             		data.add(newBook);
             		
             	}
@@ -164,11 +163,13 @@ public class Main extends Application {
             				Long.parseLong(addId.getText()),
             				addTitle.getText(),
             				Author.parseAuthors(addAuthor.getText())));    
-            		//dataProvider.addBook(new Book(Long.parseLong(addId.getText()), addTitle.getText(), Author.parseAuthors(addAuthor.getText())));
+					//	dataProvider.addBook(new Book(Long.parseLong(addId.getText()), addTitle.getText(), Author.parseAuthors(addAuthor.getText())));
+					
             	}
                 addId.clear();
                 addTitle.clear();
                 addAuthor.clear();
+                FXCollections.sort(data, compareByID);
             }
         });
         
