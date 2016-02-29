@@ -1,5 +1,7 @@
 package fx.starterkit.library.model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javafx.beans.property.SimpleListProperty;
@@ -15,6 +17,13 @@ public class Book {
 	private final SimpleStringProperty author;
 	private final SimpleListProperty<Author> authors;
 	
+	public Book() {
+		this.id = new SimpleLongProperty();
+		this.title = new SimpleStringProperty();
+		this.author = new SimpleStringProperty();
+		this.authors = new SimpleListProperty<Author>();
+	}
+	
 	public Book(Long id, String title, String author) {
 		this.id = new SimpleLongProperty(id);
 		this.title = new SimpleStringProperty(title);
@@ -26,6 +35,14 @@ public class Book {
 		this.id = new SimpleLongProperty(id);
 		this.title = new SimpleStringProperty(title);
 		this.author = new SimpleStringProperty(author);
+		ObservableList<Author> obList = FXCollections.observableArrayList(list);
+		this.authors = new SimpleListProperty<Author>(obList);
+	}
+	
+	public Book(Long id, String title, List<Author> list) {
+		this.id = new SimpleLongProperty(id);
+		this.title = new SimpleStringProperty(title);
+		this.author = new SimpleStringProperty("Dummy Author");
 		ObservableList<Author> obList = FXCollections.observableArrayList(list);
 		this.authors = new SimpleListProperty<Author>(obList);
 	}
@@ -56,11 +73,15 @@ public class Book {
 	
 	public void setAuthors(ObservableList<Author> authorList) {
 		authors.setAll(authorList);
-		//authors.addAll(authorList);
 	}
 	
 	public SimpleListProperty<Author> getAuthors() {
 		return authors;
+	}
+	
+	@Override
+	public String toString() {
+		return String.valueOf(id) + " " + title + " (" + authors + ")";
 	}
 
 	@Override
@@ -89,6 +110,19 @@ public class Book {
             return false;
         return true;
     }
+
+	public static ArrayList<Book> parseBookVO(ArrayList<BookVO> bookToList) {
+		ArrayList<Book> result = new ArrayList<>();
+		result.clear();
+		BookVO tmpBookVO = null;
+		Book tmpBook = null;
+		for(Iterator<BookVO> it = bookToList.iterator() ; it.hasNext() ; ) {
+			tmpBookVO = it.next();
+			tmpBook = new Book(tmpBookVO.getId(), tmpBookVO.getTitle(), Author.parseAuthorsVO(tmpBookVO.getAuthors()));
+			result.add(tmpBook);
+		}
+		return result;
+	}
 	
 	
 

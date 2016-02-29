@@ -3,6 +3,8 @@ package fx.starterkit.library.rest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
@@ -13,13 +15,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import fx.starterkit.library.mapper.Mapper;
 import fx.starterkit.library.model.Book;
+import fx.starterkit.library.model.BookVO;
+import net.sf.corn.httpclient.HttpClient.HTTP_METHOD;
+import net.sf.corn.httpclient.HttpForm;
 
 public class RestService {
 	
 	private Mapper mapper = new Mapper();
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public Book sendPOST(String jsonString) throws ClientProtocolException, IOException {
 		String url = "http://localhost:9721/workshop/services/books/book";
@@ -60,9 +67,10 @@ public class RestService {
 			result.append(line);
 		}
 
-		ArrayList<Book> bookToList = mapper.json2BookList(result.toString());
+		ArrayList<BookVO> bookToList = mapper.json2BookList(result.toString());
+		ArrayList<Book> bookList = Book.parseBookVO(bookToList);
 		System.out.println(result.toString());
-		return bookToList;
+		return bookList;
 	}
 	
 	public void sendDELETE(Long id) throws IOException {

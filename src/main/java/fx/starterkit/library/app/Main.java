@@ -1,17 +1,22 @@
 package fx.starterkit.library.app;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import fx.starterkit.library.dataprovider.DataProvider;
 import fx.starterkit.library.model.Author;
 import fx.starterkit.library.model.Book;
+import fx.starterkit.library.rest.RestService;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,11 +31,13 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 
 public class Main extends Application {
+	
+	private final DataProvider dataProvider = DataProvider.INSTANCE;
+	private RestService rest = new RestService();
 	
 	private TableView<Book> table = new TableView<Book>();
 	private final ObservableList<Author> authorsList = FXCollections.observableArrayList(
@@ -43,6 +50,7 @@ public class Main extends Application {
                     new Book(3L, "Lux Perpetua", "Andrzej Sapkowski", authorsList),
                     new Book(2L, "Bozy Bojownicy", "Andrzej Sapkowski", authorsList),
                     new Book(6L, "Kolejna", "Imie Nazwisko", authorsList),
+                    new Book(11L, "Bardzodlugitytulksiazkizebyprzedluzyckolumne", "A B", authorsList),
                     new Book(4L, "Lalka", "Boleslaw Prus", authorsList),
                     new Book(8L, "Ostatnia", "Autor Zapomniany", authorsList),
                     new Book(7L, "Nastepna", "Kolejny Autor", authorsList));
@@ -70,17 +78,25 @@ public class Main extends Application {
         Scene scene = new Scene(new Group());
         stage.setTitle("Library");
         stage.setWidth(800);
-        stage.setHeight(550);
+        stage.setHeight(520);
         
         FXCollections.sort(data, compareByID);
  
         final Label label = new Label("Books Library");
         label.setFont(new Font("Arial", 20));
+        label.setAlignment(Pos.BASELINE_LEFT);
+        
+        final TextField titlePrefix = new TextField();
+        titlePrefix.setPromptText("Book search: Enter (part of a) title");
+        titlePrefix.setPrefWidth(200);
+        //titlePrefix.setAlignment(Pos.BASELINE_RIGHT);
  
         table.setEditable(true);
+        table.setPrefWidth(TableView.USE_COMPUTED_SIZE);
  
         TableColumn<Book, Long> idCol = new TableColumn<Book, Long>("ID");
         idCol.setMinWidth(50);
+        idCol.setMaxWidth(50);
         idCol.setCellValueFactory(new PropertyValueFactory<Book, Long>("id"));
         //idCol.setCellFactory(TextFieldTableCell.forTableColumn());
         idCol.setOnEditCommit(
@@ -109,31 +125,11 @@ public class Main extends Application {
                         ).setTitle(t.getNewValue());
                 }
             }
-        );
- 
-        /*TableColumn<Book, String> authorCol = new TableColumn<Book, String>("Author");
-        authorCol.setMinWidth(200);
-        authorCol.setCellValueFactory(
-            new PropertyValueFactory<Book, String>("author"));
-        authorCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        authorCol.setOnEditCommit(
-            new EventHandler<CellEditEvent<Book, String>>() {
-                @Override
-                public void handle(CellEditEvent<Book, String> t) {
-                    ((Book) t.getTableView().getItems().get(
-                        t.getTablePosition().getRow())
-                        ).setAuthor(t.getNewValue());
-                }
-            }
-        );*/
-        
-        /*TableColumn<Book, List<Author>> authorsCol = new TableColumn<Book, List<Author>>("Authors");
-        authorsCol.setMinWidth(200);
-        authorsCol.setCellValueFactory(new PropertyValueFactory<Book, List<Author>>("author"));
-        authorsCol.setCellFactory();*/
+        );       
  
         table.setItems(data);
         table.getColumns().addAll(idCol, titleCol);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
  
         final TextField addId = new TextField();
         addId.setPromptText("ID");
@@ -142,7 +138,7 @@ public class Main extends Application {
         addTitle.setMaxWidth(titleCol.getPrefWidth());
         addTitle.setPromptText("Title");
         final TextField addAuthor = new TextField();
-        addAuthor.setMaxWidth(titleCol.getPrefWidth());
+        addAuthor.setPrefWidth(100);
         addAuthor.setPromptText("Author");
         
         final TextArea infoArea = new TextArea();
@@ -150,7 +146,6 @@ public class Main extends Application {
         infoArea.setEditable(false);
         infoArea.setPrefWidth(300);
         infoArea.setPrefHeight(400);
-        //infoArea.setFont(Font.font("Comic Sans MS", FontWeight.BOLD, 15));
         infoArea.setFont(Font.font("Helvetica", 15));
  
         final Button addButton = new Button("Add");
@@ -159,7 +154,8 @@ public class Main extends Application {
             public void handle(ActionEvent e) {
             	if(addId.getText().equals("")) {
             		long newId = new Long(data.get(data.size()-1).getId());
-            		Book newBook = new Book(new Long(newId + 1), addTitle.getText(), addAuthor.getText());
+            		Book newBook = new Book(new Long(newId + 1), addTitle.getText(), Author.parseAuthors(addAuthor.getText()));
+            		//dataProvider.addBook(newBook);
             		data.add(newBook);
             		
             	}
@@ -167,7 +163,8 @@ public class Main extends Application {
             		data.add(new Book(
             				Long.parseLong(addId.getText()),
             				addTitle.getText(),
-            				addAuthor.getText()));            		
+            				Author.parseAuthors(addAuthor.getText())));    
+            		//dataProvider.addBook(new Book(Long.parseLong(addId.getText()), addTitle.getText(), Author.parseAuthors(addAuthor.getText())));
             	}
                 addId.clear();
                 addTitle.clear();
@@ -177,14 +174,23 @@ public class Main extends Application {
         
         final Button searchButton = new Button("Search");
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
-        	@Override
+        	private List<Book> resultList = new ArrayList<>();
+
+			@Override
         	public void handle(ActionEvent e) {
         		data.clear();
-        		data.addAll(newData);
+        		//data.addAll(newData);
+        		try {
+					resultList = rest.sendGET(titlePrefix.getText());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+        		data.addAll(resultList);
         	}
 		});
         
-        final Button deleteButton = new Button("Delete");
+        final Button deleteButton = new Button("Delete selected");
         deleteButton.setOnAction(new EventHandler<ActionEvent>() {
         	@Override
         	public void handle(ActionEvent e) {
@@ -215,18 +221,22 @@ public class Main extends Application {
         	}
 		});
  
-        hb.getChildren().addAll(addId, addTitle, addAuthor, addButton, searchButton, deleteButton);
+        hb.getChildren().addAll(addId, addTitle, addAuthor, addButton, deleteButton);
         hb.setSpacing(3);
         
         final VBox infoVbox = new VBox();
         infoVbox.setSpacing(3);
         infoVbox.setPadding(new Insets(10, 0, 0, 10));
         infoVbox.getChildren().addAll(someButton, infoArea);
+        
+        final HBox header = new HBox();
+        header.setSpacing(15);
+        header.getChildren().addAll(label, titlePrefix, searchButton);
  
         final VBox vbox = new VBox();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
-        vbox.getChildren().addAll(label, table, hb);
+        vbox.getChildren().addAll(header, table, hb);
         
         final HBox mainHbox = new HBox();
         mainHbox.setSpacing(5);

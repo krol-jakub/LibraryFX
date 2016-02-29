@@ -11,7 +11,7 @@ import org.apache.http.HttpResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import fx.starterkit.library.dataprovider.DataProvider;
-import fx.starterkit.library.model.BookVO;
+import fx.starterkit.library.model.Book;
 import net.sf.corn.httpclient.HttpClient.HTTP_METHOD;
 import net.sf.corn.httpclient.HttpForm;
 
@@ -21,15 +21,15 @@ public class DataProviderImpl implements DataProvider {
     private ObjectMapper objectMapper = new ObjectMapper();
     
 	@SuppressWarnings("null")
-	public Collection<BookVO> findBooks(String titlePrefix) {
+	public Collection<Book> findBooks(String titlePrefix) {
 		HttpForm client = null;
-		Collection<BookVO> books = new ArrayList<BookVO>();
+		Collection<Book> books = new ArrayList<Book>();
         client.putFieldValue("titlePrefix", titlePrefix);
         HttpResponse response = null;
         try {
             client = new HttpForm(new URI(requestPath + "/books-by-title"));
             response = (HttpResponse) client.doGet();
-            books = Arrays.asList(objectMapper.readValue(((net.sf.corn.httpclient.HttpResponse) response).getData(), BookVO[].class));
+            books = Arrays.asList(objectMapper.readValue(((net.sf.corn.httpclient.HttpResponse) response).getData(), Book[].class));
         } catch (URISyntaxException e2) {
             e2.printStackTrace();
         } catch (IOException e1) {
@@ -52,17 +52,17 @@ public class DataProviderImpl implements DataProvider {
 	}
 	
 	@SuppressWarnings("null")
-	public BookVO addBook(BookVO bookVO) {
+	public Book addBook(Book bookVO) {
 		HttpForm client = null;
 		client.setContentType("Application/JSON");
         HttpResponse response = null;
         String book = null;
-        BookVO responseBook = null;
+        Book responseBook = null;
         try {
             client = new HttpForm(new URI(requestPath + "/book/"));
             book = objectMapper.writeValueAsString(bookVO);
             response = (HttpResponse) client.sendData(HTTP_METHOD.POST, book);
-            responseBook = objectMapper.readValue(((net.sf.corn.httpclient.HttpResponse) response).getData(), BookVO.class);
+            responseBook = objectMapper.readValue(((net.sf.corn.httpclient.HttpResponse) response).getData(), Book.class);
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         } catch (IOException e) {

@@ -1,6 +1,5 @@
 package fx.starterkit.library.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -8,9 +7,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import fx.starterkit.library.dataprovider.DataProvider;
-import fx.starterkit.library.model.AuthorVO;
+import fx.starterkit.library.model.Author;
+import fx.starterkit.library.model.Book;
 import fx.starterkit.library.model.BookSearch;
-import fx.starterkit.library.model.BookVO;
 import javafx.beans.property.ReadOnlyLongWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
@@ -18,9 +17,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -33,8 +29,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 public class LibraryController {
@@ -58,16 +52,16 @@ public class LibraryController {
 	private Button addButton;
 	
 	@FXML
-	private TableView<BookVO> bookTable;
+	private TableView<Book> bookTable;
 
     @FXML
-    private TableColumn<BookVO, Number> idColumn;
+    private TableColumn<Book, Number> idColumn;
 
     @FXML
-    private TableColumn<BookVO, String> titleColumn;
+    private TableColumn<Book, String> titleColumn;
 
     @FXML
-    private TableColumn<BookVO, String> authorsColumn;
+    private TableColumn<Book, String> authorsColumn;
 
     @FXML
     private AnchorPane mainPane;
@@ -92,19 +86,19 @@ public class LibraryController {
         titleColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getTitle()));
 
         authorsColumn.setCellValueFactory(
-                new Callback<TableColumn.CellDataFeatures<BookVO, String>, ObservableValue<String>>() {
+                new Callback<TableColumn.CellDataFeatures<Book, String>, ObservableValue<String>>() {
                     @Override
-                    public ObservableValue<String> call(CellDataFeatures<BookVO, String> param) {
-                        Function<AuthorVO, String> mapAuthor = a -> "" + a.getFirstName() + " " + a.getLastName();
+                    public ObservableValue<String> call(CellDataFeatures<Book, String> param) {
+                        Function<Author, String> mapAuthor = a -> "" + a.getFirstName() + " " + a.getLastName();
                         String authors = param.getValue().getAuthors().stream().map(mapAuthor)
                                 .collect(Collectors.joining(", "));
                         return new ReadOnlyStringWrapper(authors);
                     }
                 });
 
-        bookTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<BookVO>() {
+        bookTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Book>() {
             @Override
-            public void changed(ObservableValue<? extends BookVO> observable, BookVO oldValue, BookVO newValue) {
+            public void changed(ObservableValue<? extends Book> observable, Book oldValue, Book newValue) {
                 model.setSelected(newValue);
             }
         });
@@ -119,15 +113,15 @@ public class LibraryController {
 
     private void searchBooks() {
 
-        Task<Collection<BookVO>> searchTask = new Task<Collection<BookVO>>() {
+        Task<Collection<Book>> searchTask = new Task<Collection<Book>>() {
             @Override
-            protected Collection<BookVO> call() throws Exception {
+            protected Collection<Book> call() throws Exception {
                 return dataProvider.findBooks(model.getTitle());
             }
 
             @Override
             protected void succeeded() {
-                model.setResult(new ArrayList<BookVO>(getValue()));
+                model.setResult(new ArrayList<Book>(getValue()));
                 bookTable.getSortOrder().clear();
             }
         };

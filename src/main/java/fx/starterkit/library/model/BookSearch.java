@@ -17,9 +17,9 @@ public class BookSearch {
 	
 	private final LongProperty id = new SimpleLongProperty();
     private final StringProperty title = new SimpleStringProperty();
-    private final ListProperty<AuthorVO> authors = new SimpleListProperty<>();
-    private final ObjectProperty<BookVO> selected = new SimpleObjectProperty<>();
-    private final ListProperty<BookVO> result = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
+    private final ListProperty<Author> authors = new SimpleListProperty<>();
+    private final ObjectProperty<Book> selected = new SimpleObjectProperty<>();
+    private final ListProperty<Book> result = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
 
     public final Long getId() {
         return id.get();
@@ -45,39 +45,39 @@ public class BookSearch {
         return title;
     }
 
-    public final List<AuthorVO> getAuthors() {
+    public final List<Author> getAuthors() {
         return authors.get();
     }
 
-    public final void setAuthors(List<AuthorVO> value) {
+    public final void setAuthors(List<Author> value) {
         authors.setAll(value);
     }
 
-    public ListProperty<AuthorVO> authorListProperty() {
+    public ListProperty<Author> authorListProperty() {
         return authors;
     }
 
-    public final List<BookVO> getResult() {
+    public final List<Book> getResult() {
         return result.get();
     }
 
-    public final void setResult(List<BookVO> value) {
+    public final void setResult(List<Book> value) {
         result.setAll(value);
     }
 
-    public ListProperty<BookVO> resultProperty() {
+    public ListProperty<Book> resultProperty() {
         return result;
     }
 
-    public final void setSelected(BookVO value) {
+    public final void setSelected(Book value) {
         selected.set(value);
     }
 
-    public final BookVO getSelected() {
+    public final Book getSelected() {
         return selected.get();
     }
 
-    public ObjectProperty<BookVO> selectedProperty() {
+    public ObjectProperty<Book> selectedProperty() {
         return selected;
     }
 
